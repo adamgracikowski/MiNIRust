@@ -1,0 +1,9 @@
+use super::{InPlaceNumericOperations, NumberWithUnits};
+
+pub fn mul_vals(nums: &[NumberWithUnits]) -> NumberWithUnits {
+    let mut result = NumberWithUnits::unitless(1.0);
+    for num in nums {
+        result.mul_in_place(num);
+    }
+    result
+}
