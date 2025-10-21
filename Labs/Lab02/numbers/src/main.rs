@@ -2,7 +2,7 @@ mod double_string;
 mod number_with_units;
 
 use double_string::DoubleString;
-use number_with_units::{mul_vals, mul_vals_vec, NumberWithUnits, NumericOperations};
+use number_with_units::{NumberWithUnits, NumericOperations, mul_vals, mul_vals_vec};
 
 fn main() {
     let num1 = NumberWithUnits::unitless(12.22);
