@@ -32,7 +32,7 @@ fn main() -> io::Result<()> {
     stream.read_to_end(&mut response)?;
     let response = String::from_utf8_lossy(&response);
 
-    print!("{response}");
+    println!("{response}");
 
     Ok(())
 }
