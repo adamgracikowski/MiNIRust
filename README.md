@@ -7,3 +7,4 @@ A collection of assignments completed as part of the _Programming in Rust_ cours
   - Lab02: [numbers](https://github.com/adamgracikowski/MiNIRust/tree/main/Labs/Lab02/numbers)
   - Lab03: [expressions](https://github.com/adamgracikowski/MiNIRust/tree/main/Labs/Lab03/expressions)
   - Lab04: [divisors](https://github.com/adamgracikowski/MiNIRust/tree/main/Labs/Lab04/divisors)
+  - Lab05: [simple_language](https://github.com/adamgracikowski/MiNIRust/tree/main/Labs/Lab05/simple_language)
