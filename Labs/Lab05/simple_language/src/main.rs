@@ -6,7 +6,58 @@ pub use core::{Context, Expr, Stmt};
 pub use expr::*;
 pub use stmt::*;
 
-fn main() {}
+fn main() {
+    let ctx1 = Context::from([("x", 5), ("y", 10)]);
+    let mut program1 = seq(print(1u64), print(2u64));
+    println!("Running: seq(print(1), print(2))");
+    program1.exec_stmt(&ctx1);
+
+    let mut program2 = repeat::<3, _>(print(constant("x")));
+    println!("\nRunning: repeat::<3, _>(print(constant(\"x\"))) (gdzie x=5)");
+    program2.exec_stmt(&ctx1);
+
+    let mut program3 = seq(print(100u64), nothing());
+    println!("\nRunning: seq(print(100), nothing())");
+    program3.exec_stmt(&ctx1);
+
+    let ctx2 = Context::from([("is_active", 1), ("counter", 4)]);
+    let mut a: u64 = 0;
+    let b: u64 = 42;
+    let mut expr1 = when(constant("is_active"), 111u64, 222u64);
+    let val1 = expr1.exec_expr(&ctx2);
+    println!("Result 'when(1, 111, 222)': {val1}");
+
+    let mut expr2 = save_in(&mut a, when(constant("counter"), 99u64, 88u64));
+    println!("\nRunning: save_in(&mut a, when(constant(\"counter\"), 99, 88))");
+    let val2 = expr2.exec_expr(&ctx2);
+    println!("Result 'save_in': {val2}");
+    println!("New value 'a': {a}");
+
+    let mut expr3 = read_from(&b);
+    let val3 = expr3.exec_expr(&ctx2);
+    println!("\nResult 'read_from(&b)' (b=42): {val3}");
+
+    let mut stmt4 = print(read_from(&a));
+    println!("\nRunning: print(read_from(&a)) (a=99)");
+    stmt4.exec_stmt(&ctx2);
+
+    let ctx3 = Context::from([("y", 10)]);
+    let mut v: u64 = 0;
+
+    let mut expr_v1 = volatile(&mut v, "y", when(constant("y"), 7u64, 8u64));
+
+    println!("Running volatile (v=0, ctx[y]=10), shadowing 'y' with value 'v'");
+    let res1 = expr_v1.exec_expr(&ctx3);
+    println!("Result volatile 1: {res1}");
+    println!("New value 'v': {v}");
+
+    let mut expr_v2 = volatile(&mut v, "y", when(constant("y"), 7u64, 8u64));
+
+    println!("\nRunning volatile again (v=8, ctx[y]=10), shadowing 'y' with value 'v'");
+    let res2 = expr_v2.exec_expr(&ctx3);
+    println!("Result volatile 2: {res2}");
+    println!("New value 'v': {v}");
+}
 
 #[cfg(test)]
 mod tests {
