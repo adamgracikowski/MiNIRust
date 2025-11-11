@@ -15,7 +15,7 @@ use database::{
 };
 
 fn main() -> Result<()> {
-    let cli = Cli::default();
+    let cli = Cli;
     let database_type = cli.get_type();
 
     match database_type {

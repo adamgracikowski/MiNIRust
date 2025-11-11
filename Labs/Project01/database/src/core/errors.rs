@@ -4,12 +4,12 @@ mod select_error;
 
 pub use create_error::CreateError;
 pub use insert_error::InsertError;
-use miette::Diagnostic;
 pub use select_error::SelectError;
 
 use std::io;
 
 use bincode::error::{DecodeError, EncodeError};
+use miette::Diagnostic;
 use thiserror::Error;
 
 use crate::{ast::AstError, core::DataType, parsing::ParsingError};
@@ -39,7 +39,7 @@ pub enum DatabaseError {
     Ast(#[from] AstError),
 
     #[error(transparent)]
-    Parse(#[from] ParsingError),
+    Parse(#[from] Box<ParsingError>),
 
     #[error(transparent)]
     Insert(#[from] InsertError),

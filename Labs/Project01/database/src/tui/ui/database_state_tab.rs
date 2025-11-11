@@ -8,6 +8,7 @@ use crate::{core::DatabaseKey, tui::App};
 
 use super::{create_records_table, create_schema_table};
 
+/// Renders the "Database State" tab view.
 pub fn create_database_state_tab<K: DatabaseKey>(f: &mut Frame, app: &App<K>, area: Rect) {
     let table_names: Vec<&String> = app.database.tables.keys().collect();
     if table_names.is_empty() {
@@ -39,7 +40,7 @@ pub fn create_database_state_tab<K: DatabaseKey>(f: &mut Frame, app: &App<K>, ar
         let schema_block = Block::default().borders(Borders::ALL).title(schema_title);
         create_schema_table(f, schema_block, &table.schema, table_layout[0]);
 
-        let data_title = format!(" Rows ");
+        let data_title = " Rows ".to_string();
         let data_block = Block::default().borders(Borders::ALL).title(data_title);
         let records: Vec<_> = table.rows.values().cloned().collect();
         create_records_table(f, data_block, &records, table_layout[1]);

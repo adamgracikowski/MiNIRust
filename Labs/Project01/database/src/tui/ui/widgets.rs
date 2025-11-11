@@ -10,6 +10,7 @@ use unicode_width::UnicodeWidthStr;
 
 use crate::core::{DataType, Record};
 
+/// Renders a `Table` widget displaying the schema of a database table.
 pub fn create_schema_table(
     f: &mut Frame,
     block: Block,
@@ -31,7 +32,7 @@ pub fn create_schema_table(
         .map(|(name, dtype)| {
             let cells = vec![
                 Cell::from(name.as_str()),
-                Cell::from(format!("{:?}", dtype)).style(Style::default().fg(Color::Yellow)),
+                Cell::from(format!("{dtype:?}")).style(Style::default().fg(Color::Yellow)),
             ];
             Row::new(cells)
         })
@@ -46,6 +47,7 @@ pub fn create_schema_table(
     f.render_widget(t, area);
 }
 
+/// Renders a `Table` widget displaying the data (rows) from a `SELECT` query.
 pub fn create_records_table(f: &mut Frame, block: Block, records: &[Record], area: Rect) {
     if records.is_empty() {
         f.render_widget(Paragraph::new("No data.").block(block), area);
@@ -98,6 +100,7 @@ pub fn create_records_table(f: &mut Frame, block: Block, records: &[Record], are
     f.render_widget(t, area);
 }
 
+/// Calculates the optimal column widths for a `Table` based on its content.
 fn calculate_column_widths(headers: &[String], records: &[Record]) -> Vec<Constraint> {
     let mut widths: Vec<usize> = headers.iter().map(|h| h.width()).collect();
 

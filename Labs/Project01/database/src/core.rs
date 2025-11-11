@@ -7,6 +7,6 @@ mod errors;
 mod models;
 mod types;
 
-pub use errors::{DatabaseError, DatabaseResult, InsertError, SelectError};
+pub use errors::{CreateError, DatabaseError, DatabaseResult, InsertError, SelectError};
 pub use models::{Database, DatabaseKey, DatabaseType, Record, Table};
 pub use types::{DataType, DataValue};

@@ -12,7 +12,7 @@ use crate::QueryRule;
 #[derive(Error, Debug, Diagnostic)]
 pub enum ParsingError {
     #[error(transparent)]
-    Pest(#[from] pest::error::Error<QueryRule>),
+    Pest(#[from] Box<pest::error::Error<QueryRule>>),
 
     #[error(transparent)]
     Int(#[from] ParseIntError),

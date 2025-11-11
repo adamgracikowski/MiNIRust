@@ -25,14 +25,14 @@ impl fmt::Display for ExecutionResult {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             ExecutionResult::Success => write!(f, "Success"),
-            ExecutionResult::RowsAffected(n) => write!(f, "{} row(s) affected", n),
+            ExecutionResult::RowsAffected(n) => write!(f, "{n} row(s) affected"),
             ExecutionResult::Data(records) => {
                 if records.is_empty() {
                     writeln!(f, "No data")
                 } else {
                     writeln!(f, "Returned {} record(s):", records.len())?;
                     for (i, record) in records.iter().enumerate() {
-                        writeln!(f, "{:>3}: {}", i + 1, record)?;
+                        writeln!(f, "{:>3}: {record}", i + 1)?;
                     }
                     Ok(())
                 }
@@ -43,7 +43,7 @@ impl fmt::Display for ExecutionResult {
                 } else {
                     writeln!(f, "Messages:")?;
                     for msg in msgs {
-                        writeln!(f, "- {}", msg)?;
+                        writeln!(f, "- {msg}")?;
                     }
                     Ok(())
                 }

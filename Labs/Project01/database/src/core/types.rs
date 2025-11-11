@@ -90,13 +90,11 @@ impl DataValue {
             (Self::Boolean(l), Self::Boolean(r)) => match op {
                 Operator::Eq => Ok(l == r),
                 Operator::NotEq => Ok(l != r),
-                _ => {
-                    return Err(AstError::InvalidOperatorForType {
-                        operator: op.clone(),
-                        dtype: DataType::Boolean,
-                    }
-                    .into());
+                _ => Err(AstError::InvalidOperatorForType {
+                    operator: op.clone(),
+                    dtype: DataType::Boolean,
                 }
+                .into()),
             },
 
             (l, r) => Err(DatabaseError::ComparisonTypeMismatch {
@@ -111,13 +109,13 @@ impl DataValue {
 impl Display for DataValue {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         match self {
-            DataValue::Boolean(v) => write!(f, "{v}"),
-            DataValue::String(v) => {
+            Self::Boolean(v) => write!(f, "{v}"),
+            Self::String(v) => {
                 let escaped = v.replace('"', "\\\"");
                 write!(f, "\"{escaped}\"")
             }
-            DataValue::Int(v) => write!(f, "{v}"),
-            DataValue::Float(v) => write!(f, "{v}"),
+            Self::Int(v) => write!(f, "{v}"),
+            Self::Float(v) => write!(f, "{v}"),
         }
     }
 }
@@ -133,14 +131,7 @@ impl Eq for DataValue {}
 /// It returns `None` if the types are different (e.g., Int vs. String).
 impl PartialOrd for DataValue {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        match (self, other) {
-            (Self::Boolean(l), Self::Boolean(r)) => l.partial_cmp(r),
-            (Self::Int(l), Self::Int(r)) => l.partial_cmp(r),
-            (Self::String(l), Self::String(r)) => l.partial_cmp(r),
-            (Self::Float(l), Self::Float(r)) => l.partial_cmp(r),
-            // Cannot compare different types
-            _ => None,
-        }
+        Some(self.cmp(other))
     }
 }
 

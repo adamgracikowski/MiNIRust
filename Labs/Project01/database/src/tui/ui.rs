@@ -3,8 +3,6 @@ mod database_state_tab;
 mod queries_tab;
 mod widgets;
 
-use std::usize;
-
 pub use active_tab::ActiveTab;
 pub use database_state_tab::create_database_state_tab;
 pub use queries_tab::create_queries_tab;
@@ -19,6 +17,7 @@ use ratatui::{
 
 use crate::{core::DatabaseKey, tui::App};
 
+/// The main rendering function for the TUI, called on every frame.
 pub fn ui<K: DatabaseKey>(f: &mut Frame, app: &mut App<K>) {
     let chunks = Layout::default()
         .direction(Direction::Vertical)

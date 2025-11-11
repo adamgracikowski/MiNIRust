@@ -7,18 +7,27 @@ use crate::{
     tui::ui::ActiveTab,
 };
 
+/// Represents the main state structure for the TUI application.
 pub struct App<K: DatabaseKey> {
+    /// A persistent instance of the query parser.
     parser: QueryParser,
 
+    /// The active database instance, generic over the key type `K`.
     pub database: Database<K>,
+    /// The string buffer for the multi-line query input field.
     pub input: String,
+    /// The current byte index of the cursor within the `input` string.
     pub cursor_position: usize,
+    /// The currently active tab.
     pub active_tab: ActiveTab,
+    /// The result of the last executed query.
     pub last_result: Option<Result<ExecutionResult, String>>,
+    /// Flag to control the main TUI loop.
     pub should_quit: bool,
 }
 
 impl<K: DatabaseKey> Default for App<K> {
+    /// Provides a default implementation to create an initial `App` state.
     fn default() -> Self {
         Self {
             database: Database::<K>::default(),
@@ -33,6 +42,7 @@ impl<K: DatabaseKey> Default for App<K> {
 }
 
 impl<K: DatabaseKey> App<K> {
+    /// Parses, validates, and executes the query currently in the `input` buffer.
     pub fn execute_current_query(&mut self) {
         let query_to_parse = self.input.trim();
         if query_to_parse.is_empty() {
@@ -58,6 +68,7 @@ impl<K: DatabaseKey> App<K> {
         self.cursor_position = 0;
     }
 
+    /// The main key event handler for the application.
     pub fn handle_key_event(&mut self, key: KeyEvent) {
         match key.code {
             KeyCode::Esc => self.should_quit = true,
@@ -77,11 +88,15 @@ impl<K: DatabaseKey> App<K> {
         }
     }
 
+    /// Inserts a character into the `input` buffer at the current cursor
+    /// position and advances the cursor.
     pub fn on_key(&mut self, c: char) {
         self.input.insert(self.cursor_position, c);
         self.cursor_position += 1;
     }
 
+    /// Deletes the character immediately before the cursor, correctly handling
+    /// UTF-8 character boundaries, and moves the cursor backward.
     pub fn on_backspace(&mut self) {
         if self.cursor_position > 0 {
             let prev_char_boundary = self.input[..self.cursor_position]
@@ -93,6 +108,8 @@ impl<K: DatabaseKey> App<K> {
         }
     }
 
+    /// Moves the cursor one character to the left, correctly handling
+    /// UTF-8 character boundaries.
     pub fn on_left(&mut self) {
         if self.cursor_position > 0 {
             let prev_char_boundary = self.input[..self.cursor_position]
@@ -103,6 +120,8 @@ impl<K: DatabaseKey> App<K> {
         }
     }
 
+    /// Moves the cursor one character to the right, correctly handling
+    /// UTF-8 character boundaries.
     pub fn on_right(&mut self) {
         let next_char_boundary = self.input[self.cursor_position..]
             .char_indices()

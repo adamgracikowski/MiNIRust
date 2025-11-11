@@ -9,6 +9,7 @@ use crate::{core::DatabaseKey, execution::ExecutionResult, tui::App};
 
 use super::create_records_table;
 
+/// Renders the "Queries" tab view.
 pub fn create_queries_tab<K: DatabaseKey>(f: &mut Frame, app: &App<K>, area: Rect) {
     let chunks = Layout::default()
         .direction(Direction::Vertical)

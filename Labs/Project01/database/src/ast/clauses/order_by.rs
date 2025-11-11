@@ -27,13 +27,6 @@ impl TryFrom<&str> for OrderDirection {
 
     /// Attempts to parse a string slice into an `OrderDirection`.
     ///
-    /// # Examples
-    ///
-    /// ```
-    /// let dir = OrderDirection::try_from("ASC")?;
-    /// assert_eq!(dir, OrderDirection::Asc);
-    /// ```
-    ///
     /// # Errors
     ///
     /// Returns `AstError::UnknownOrder` if the string is not

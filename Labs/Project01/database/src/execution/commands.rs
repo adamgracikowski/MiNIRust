@@ -45,7 +45,7 @@ pub fn build_execute_command<'a, K: DatabaseKey>(
             database.push_to_history(&stmt.query);
             Box::new(Create {
                 ast: stmt,
-                database: database,
+                database,
             })
         }
         Command::Delete(stmt) => {

@@ -10,9 +10,7 @@ use crate::core::{DataType, DataValue};
 /// This trait combines standard Rust traits (like `Clone`, `Eq`, `Hash`, `Ord`)
 /// with traits required for binary serialization (`Encode`, `Decode`) and
 /// custom database logic (`key_type`, `from_datavalue`).
-pub trait DatabaseKey:
-    Clone + Eq + Hash + Ord + Debug + Sized + Encode + Decode<()>
-{
+pub trait DatabaseKey: Clone + Eq + Hash + Ord + Debug + Sized + Encode + Decode<()> {
     /// Returns the corresponding `DataType` enum variant for this key type.
     ///
     /// This is used for type validation, e.g., ensuring an `i64` key

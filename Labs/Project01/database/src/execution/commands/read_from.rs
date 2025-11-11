@@ -46,16 +46,16 @@ impl<'a, K: DatabaseKey> Execute for ReadFrom<'a, K> {
 
         let mut log_messages = Vec::new();
 
-        log_messages.push(format!("Reading queries from '{}'...", path));
+        log_messages.push(format!("Reading queries from '{path}'..."));
 
         for (index, query) in queries.enumerate() {
-            log_messages.push(format!("[Query {}] Executing: {}...", index + 1, query));
+            log_messages.push(format!("[Query {}] Executing: {query}...", index + 1));
 
             let ast = parser.parse_query(query)?;
 
             let mut executable_command = build_execute_command(self.database, ast)?;
             let result = executable_command.execute()?;
-            log_messages.push(format!("[Query {}] ...Success: {:?}", index + 1, result));
+            log_messages.push(format!("[Query {}] ...Success: {result:?}", index + 1));
         }
 
         log_messages.push("Script executed successfully.".to_string());

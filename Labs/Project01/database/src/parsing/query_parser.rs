@@ -32,7 +32,8 @@ impl QueryParser {
     /// * `DatabaseError::Parse` if the input string violates the grammar (syntax error).
     /// * `DatabaseError::Ast` or other variants if the AST building fails (e.g., conversion error).
     pub fn parse_query(&self, input: &str) -> DatabaseResult<Command> {
-        let pairs = QueryParser::parse(Rule::query, input).map_err(ParsingError::from)?;
+        let pairs = QueryParser::parse(Rule::query, input)
+            .map_err(|e| Box::new(ParsingError::from(Box::new(e))))?;
         let query = pairs.into_iter().next().unwrap();
         let query_raw = query.as_span().as_str();
         let command = query.into_inner().next().unwrap();
@@ -68,9 +69,9 @@ impl QueryParser {
                 Command::LoadFrom(LoadFromStmt { path })
             }
             rule => {
-                return Err(DatabaseError::from(ParsingError::UnexpectedRule {
-                    rule: rule.clone(),
-                }));
+                return Err(DatabaseError::from(Box::new(
+                    ParsingError::UnexpectedRule { rule: *rule },
+                )));
             }
         };
         Ok(command)
@@ -92,19 +93,33 @@ impl QueryParser {
         let inner = pair.into_inner().next().unwrap();
         match inner.as_rule() {
             Rule::int_literal => {
-                let literal = inner.as_str().parse::<i64>().map_err(ParsingError::from)?;
+                let literal = inner
+                    .as_str()
+                    .parse::<i64>()
+                    .map_err(ParsingError::from)
+                    .map_err(Box::new)?;
                 Ok(DataValue::Int(literal))
             }
             Rule::float_literal => {
-                let literal = inner.as_str().parse::<f64>().map_err(ParsingError::from)?;
+                let literal = inner
+                    .as_str()
+                    .parse::<f64>()
+                    .map_err(ParsingError::from)
+                    .map_err(Box::new)?;
                 Ok(DataValue::Float(literal))
             }
             Rule::string_literal => Ok(DataValue::String(self.build_string_literal(inner))),
             Rule::bool_literal => {
-                let literal = inner.as_str().parse::<bool>().map_err(ParsingError::from)?;
+                let literal = inner
+                    .as_str()
+                    .parse::<bool>()
+                    .map_err(ParsingError::from)
+                    .map_err(Box::new)?;
                 Ok(DataValue::Boolean(literal))
             }
-            rule => return Err(DatabaseError::from(ParsingError::UnexpectedRule { rule })),
+            rule => Err(DatabaseError::from(Box::new(
+                ParsingError::UnexpectedRule { rule },
+            ))),
         }
     }
 
@@ -202,10 +217,7 @@ impl QueryParser {
 
         let fields = field_list_pair
             .into_inner()
-            .map(|id_pair| {
-                let name = id_pair.as_str().to_string();
-                name
-            })
+            .map(|id_pair| id_pair.as_str().to_string())
             .collect();
 
         let table_name = from_clause_pair
@@ -250,9 +262,19 @@ impl QueryParser {
                 }
                 Rule::limit_clause => {
                     let int_pair = optional_pair.into_inner().next().unwrap();
-                    clauses.limit = Some(int_pair.as_str().parse().map_err(ParsingError::from)?);
+                    clauses.limit = Some(
+                        int_pair
+                            .as_str()
+                            .parse::<i64>()
+                            .map_err(ParsingError::from)
+                            .map_err(Box::new)?,
+                    );
                 }
-                rule => return Err(DatabaseError::from(ParsingError::UnexpectedRule { rule })),
+                rule => {
+                    return Err(DatabaseError::from(Box::new(
+                        ParsingError::UnexpectedRule { rule },
+                    )));
+                }
             }
         }
 
@@ -280,7 +302,9 @@ impl QueryParser {
                     value: self.build_value(value)?,
                 }))
             }
-            rule => return Err(DatabaseError::from(ParsingError::UnexpectedRule { rule })),
+            rule => Err(DatabaseError::from(Box::new(
+                ParsingError::UnexpectedRule { rule },
+            ))),
         }
     }
 
@@ -320,5 +344,193 @@ impl QueryParser {
             };
         }
         Ok(left)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::{
+        ast::{
+            Assignment, Command, Comparison, Condition, CreateStmt, DeleteStmt, DumpToStmt, Field,
+            InsertStmt, LoadFromStmt, Operator, OptionalClauses, OrderBy, OrderDirection,
+            ReadFromStmt, SaveAsStmt, SelectStmt,
+        },
+        core::{DataType, DataValue},
+    };
+
+    /// Helper function to reduce boilerplate in tests.
+    /// Panics if parsing fails, which is expected for valid query tests.
+    fn parse_helper(query: &str) -> Command {
+        let parser = QueryParser;
+        parser.parse_query(query).unwrap_or_else(|e| {
+            panic!(
+                "Parser failed when it should have succeeded. Query: '{}', Error: {:?}",
+                query, e
+            )
+        })
+    }
+
+    /// Helper function to test queries that are expected to fail parsing.
+    fn parse_helper_fails(query: &str) {
+        let parser = QueryParser;
+        assert!(
+            parser.parse_query(query).is_err(),
+            "Parser succeeded for invalid query: '{}'",
+            query
+        );
+    }
+
+    #[test]
+    fn test_parse_create() {
+        let query = "CREATE users KEY id FIELDS id: INT, name: STRING;";
+        let expected = Command::Create(CreateStmt {
+            table_name: "users".to_string(),
+            key_field: "id".to_string(),
+            fields: vec![
+                Field {
+                    name: "id".to_string(),
+                    data_type: DataType::Int,
+                },
+                Field {
+                    name: "name".to_string(),
+                    data_type: DataType::String,
+                },
+            ],
+            query: query.to_string(),
+        });
+        assert_eq!(parse_helper(query), expected);
+    }
+
+    #[test]
+    fn test_parse_insert() {
+        let query = "INSERT id = 123, name = \"Alice\", active = true INTO users;";
+        let expected = Command::Insert(InsertStmt {
+            table_name: "users".to_string(),
+            assignments: vec![
+                Assignment {
+                    field_name: "id".to_string(),
+                    value: DataValue::Int(123),
+                },
+                Assignment {
+                    field_name: "name".to_string(),
+                    value: DataValue::String("Alice".to_string()),
+                },
+                Assignment {
+                    field_name: "active".to_string(),
+                    value: DataValue::Boolean(true),
+                },
+            ],
+            query: query.to_string(),
+        });
+        assert_eq!(parse_helper(query), expected);
+    }
+
+    #[test]
+    fn test_parse_delete() {
+        let query = "DELETE \"user-key-1\" FROM users;";
+        let expected = Command::Delete(DeleteStmt {
+            table_name: "users".to_string(),
+            key_value: DataValue::String("user-key-1".to_string()),
+            query: query.to_string(),
+        });
+        assert_eq!(parse_helper(query), expected);
+    }
+
+    #[test]
+    fn test_parse_select_all_clauses() {
+        let query = "SELECT id, name FROM users WHERE (id > 10 OR name = \"Bob\") AND active = true ORDER_BY name DESC LIMIT 5;";
+
+        let expected_condition = Condition::And {
+            left: Box::new(Condition::Or {
+                left: Box::new(Condition::Comparison(Comparison {
+                    field: "id".to_string(),
+                    op: Operator::Gt,
+                    value: DataValue::Int(10),
+                })),
+                right: Box::new(Condition::Comparison(Comparison {
+                    field: "name".to_string(),
+                    op: Operator::Eq,
+                    value: DataValue::String("Bob".to_string()),
+                })),
+            }),
+            right: Box::new(Condition::Comparison(Comparison {
+                field: "active".to_string(),
+                op: Operator::Eq,
+                value: DataValue::Boolean(true),
+            })),
+        };
+
+        let expected = Command::Select(SelectStmt {
+            fields: vec!["id".to_string(), "name".to_string()],
+            table_name: "users".to_string(),
+            optional_clauses: OptionalClauses {
+                where_clause: Some(expected_condition),
+                order_by: Some(OrderBy {
+                    column: "name".to_string(),
+                    direction: OrderDirection::Desc,
+                }),
+                limit: Some(5),
+            },
+            query: query.to_string(),
+        });
+        assert_eq!(parse_helper(query), expected);
+    }
+
+    #[test]
+    fn test_parse_select_simple() {
+        let query = "SELECT name FROM users;";
+        let expected = Command::Select(SelectStmt {
+            fields: vec!["name".to_string()],
+            table_name: "users".to_string(),
+            optional_clauses: OptionalClauses::default(),
+            query: query.to_string(),
+        });
+        assert_eq!(parse_helper(query), expected);
+    }
+
+    #[test]
+    fn test_parse_dump_to() {
+        let query = "DUMP_TO \"data/backup.bin\";";
+        let expected = Command::DumpTo(DumpToStmt {
+            path: "data/backup.bin".to_string(),
+        });
+        assert_eq!(parse_helper(query), expected);
+    }
+
+    #[test]
+    fn test_parse_load_from() {
+        let query = "LOAD_FROM \"data/backup.bin\";";
+        let expected = Command::LoadFrom(LoadFromStmt {
+            path: "data/backup.bin".to_string(),
+        });
+        assert_eq!(parse_helper(query), expected);
+    }
+
+    #[test]
+    fn test_parse_save_as() {
+        let query = "SAVE_AS \"history.sql\";";
+        let expected = Command::SaveAs(SaveAsStmt {
+            path: "history.sql".to_string(),
+        });
+        assert_eq!(parse_helper(query), expected);
+    }
+
+    #[test]
+    fn test_parse_read_from() {
+        let query = "READ_FROM \"script.sql\";";
+        let expected = Command::ReadFrom(ReadFromStmt {
+            path: "script.sql".to_string(),
+        });
+        assert_eq!(parse_helper(query), expected);
+    }
+
+    #[test]
+    fn test_invalid_query_fails() {
+        parse_helper_fails("SELECT FROM users;");
+        parse_helper_fails("CREATE users;");
+        parse_helper_fails("INSERT users name = 1;");
+        parse_helper_fails("SELECT id FROM users WHERE age =;");
+        parse_helper_fails("SELECT name FROM users WHERE age > 10 AND;");
     }
 }
