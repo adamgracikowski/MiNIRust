@@ -1,4 +1,4 @@
-# Database
+# 💾 Database
 
 A simple, lightweight SQL-like database engine written in `Rust`.
 
@@ -15,7 +15,7 @@ cargo run --bin database-gui -- --type string
 ```
 
 <p align="center">
-  <img src="docs/images/help.png" width="300"/>
+  <img src="docs/images/help.png"/>
 </p>
 
 ## TUI (Text User Interface)
@@ -32,25 +32,25 @@ cargo run --bin database-gui -- --type string
 ### Queries Tab
 
 <p align="center">
-  <img src="docs/images/select.png" width="300"/>
+  <img src="docs/images/select.png"/>
 </p>
 
 ### Database State Tab
 
 <p align="center">
-  <img src="docs/images/database_state.png" width="300"/>
+  <img src="docs/images/database_state.png"/>
 </p>
 
 ### Running Scripts
 
 <p align="center">
-  <img src="docs/images/read_from.png" width="300"/>
+  <img src="docs/images/read_from.png"/>
 </p>
 
 ### Execution Errors
 
 <p align="center">
-  <img src="docs/images/execution_error.png" width="300"/>
+  <img src="docs/images/execution_error.png"/>
 </p>
 
 ## Supported Syntax
