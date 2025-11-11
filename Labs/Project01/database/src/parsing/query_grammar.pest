@@ -1,0 +1,104 @@
+WHITESPACE = _{ " " | "\t" | "\r" | "\n" }
+
+query = {
+    SOI ~ (
+        create_stmt | 
+        insert_stmt | 
+        delete_stmt | 
+        select_stmt | 
+        save_as_stmt | 
+        read_from_stmt | 
+        dump_to_stmt | 
+        load_from_stmt
+    ) ~ _SEMICOLON ~ EOI
+}
+
+create_stmt = { _KW_CREATE ~ identifier ~ _KW_KEY ~ identifier ~ _KW_FIELDS ~ field_def_list }
+field_def = { identifier ~ _COLON ~ data_type }
+field_def_list = { field_def ~ (_COMMA ~ field_def)* }
+
+insert_stmt = { _KW_INSERT ~ assignment_list ~ _KW_INTO ~ identifier }
+assignment = { identifier ~ _EQ ~ value }
+assignment_list = { assignment ~ (_COMMA ~ assignment)* }
+
+delete_stmt = { _KW_DELETE ~ value ~ _KW_FROM ~ identifier }
+
+select_stmt = {
+    _KW_SELECT ~ field_list ~ 
+    from_clause ~ 
+    (where_clause)? ~ 
+    (orderby_clause)? ~ 
+    (limit_clause)? 
+}
+
+save_as_stmt = { _KW_SAVE_AS ~ file_path }
+read_from_stmt = { _KW_READ_FROM ~ file_path }
+dump_to_stmt = { _KW_DUMP_TO ~ file_path }
+load_from_stmt = { _KW_LOAD_FROM ~ file_path }
+
+field_list = { identifier ~ (_COMMA ~ identifier)* }
+
+from_clause = { _KW_FROM ~ identifier }
+
+where_clause = { _KW_WHERE ~ condition }
+
+condition = { and_condition ~ (_KW_OR ~ and_condition)* }
+and_condition = { primary_condition ~ (_KW_AND ~ primary_condition)* }
+primary_condition = { (identifier ~ op ~ value) | (_LPAREN ~ condition ~ _RPAREN) }
+
+orderby_clause = { _KW_ORDER_BY ~ identifier ~ order_direction }
+order_direction = { KW_ASC | KW_DESC }
+
+limit_clause = { _KW_LIMIT ~ int_literal }
+
+op = { "=" | "!=" | "<=" | ">=" | "<" | ">" }
+
+identifier = @{ !keyword ~ (ASCII_ALPHA | "_") ~ (ASCII_ALPHANUMERIC | "_")* }
+
+data_type = @{ KW_TYPE }
+file_path = { string_literal }
+value = { float_literal | int_literal | string_literal | bool_literal }
+
+string_literal = @{ "\"" ~ ( (!"\"" ~ ANY) | "\\\"" )* ~ "\"" }
+int_literal = @{ "-"? ~ ASCII_DIGIT+ }
+float_literal = @{ "-"? ~ ASCII_DIGIT+ ~ "." ~ ASCII_DIGIT+ }
+bool_literal = @{ KW_BOOL }
+
+_KW_CREATE = _{ "CREATE" }
+_KW_KEY = _{ "KEY" }
+_KW_FIELDS = _{ "FIELDS" }
+_KW_INSERT = _{ "INSERT" }
+_KW_INTO = _{ "INTO" }
+_KW_DELETE = _{ "DELETE" }
+_KW_FROM = _{ "FROM" }
+_KW_SELECT = _{ "SELECT" }
+_KW_WHERE = _{ "WHERE" }
+_KW_ORDER_BY = _{ "ORDER_BY" }
+_KW_LIMIT = _{ "LIMIT" }
+_KW_SAVE_AS = _{ "SAVE_AS" }
+_KW_READ_FROM = _{ "READ_FROM" }
+_KW_DUMP_TO = _{ "DUMP_TO" }
+_KW_LOAD_FROM = _{ "LOAD_FROM" }
+
+_KW_AND = _{ "AND" }
+_KW_OR = _{ "OR" }
+
+_COLON = _{ ":" }
+_COMMA = _{ "," }
+_EQ = _{ "=" }
+_LPAREN = _{ "(" }
+_RPAREN = _{ ")" }
+_SEMICOLON = _{ ";" }
+
+KW_ASC = { "ASC" }
+KW_DESC = { "DESC" }
+KW_TYPE = { "INT" | "FLOAT" | "STRING" | "BOOLEAN" | "String" }
+KW_BOOL = { "true" | "false" }
+
+keyword = _{
+    _KW_CREATE | _KW_KEY | _KW_FIELDS | _KW_INSERT | _KW_INTO | _KW_DELETE |
+    _KW_FROM | _KW_SELECT | _KW_WHERE | _KW_ORDER_BY | _KW_LIMIT |
+    _KW_SAVE_AS | _KW_READ_FROM | _KW_DUMP_TO | _KW_LOAD_FROM |
+    _KW_AND | _KW_OR |
+    KW_ASC | KW_DESC | KW_TYPE | KW_BOOL
+}
