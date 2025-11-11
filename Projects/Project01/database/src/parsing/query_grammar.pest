@@ -92,7 +92,7 @@ _SEMICOLON = _{ ";" }
 
 KW_ASC = { "ASC" }
 KW_DESC = { "DESC" }
-KW_TYPE = { "INT" | "FLOAT" | "STRING" | "BOOLEAN" | "String" }
+KW_TYPE = { "INT" | "FLOAT" | "STRING" | "BOOLEAN" }
 KW_BOOL = { "true" | "false" }
 
 keyword = _{

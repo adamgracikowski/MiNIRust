@@ -160,6 +160,12 @@ database/
 | [`bincode`](https://crates.io/crates/bincode)     | Used for fast binary serialization/deserialization for `DUMP_TO` and `LOAD_FROM`. |
 | [`pest`](https://pest.rs/)                        | Used to define the SQL grammar and parse raw query strings into a parse tree.     |
 
+## Favourite Module
+
+My favourite modules in this project are `parsing` and `ast`.
+
+These modules are where the raw text query, defined by a formal grammar (`query_grammar.pest`), is transformed into a structured, verifiable data model (`ast::Command`). I enjoy this part the most as it directly applies concepts from compiler design and formal language theory.
+
 ## Acknowledgements
 
 Special thanks to [Szymon Zyguła](https://github.com/szymon-zygula) for providing the original idea for this project.
