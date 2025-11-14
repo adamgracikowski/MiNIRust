@@ -8,5 +8,6 @@ A collection of assignments completed as part of the _Programming in Rust_ cours
   - Lab03: [`expressions`](https://github.com/adamgracikowski/MiNIRust/tree/main/Labs/Lab03/expressions)
   - Lab04: [`divisors`](https://github.com/adamgracikowski/MiNIRust/tree/main/Labs/Lab04/divisors)
   - Lab05: [`simple_language`](https://github.com/adamgracikowski/MiNIRust/tree/main/Labs/Lab05/simple_language)
+  - Lab07: [`iterloop`](https://github.com/adamgracikowski/MiNIRust/tree/main/Labs/Lab07/iterloop)
 - Projects:
   - Project01: [`database`](https://github.com/adamgracikowski/MiNIRust/tree/main/Projects/Project01/database)
