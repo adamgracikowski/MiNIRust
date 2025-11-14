@@ -1,5 +1,5 @@
 [package]
-name = "interloop"
+name = "iterloop"
 version = "0.1.0"
 edition = "2024"
 
