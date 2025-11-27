@@ -38,7 +38,7 @@ let b = Box::new(5); // 5 is stored on the heap
 
 - Scenarios where a value needs to be used by multiple parts of the program, and we don't know at compile time which part will finish using the data last (e.g., graph nodes).
 
-## Common Usage:
+### Common Usage:
 
 - Often combined with `RefCell<T>` (`Rc<RefCell<T>>`) to allow mutation of shared data.
 
