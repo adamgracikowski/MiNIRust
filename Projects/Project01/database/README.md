@@ -1,6 +1,6 @@
 # 💾 Database
 
-A simple, lightweight SQL-like database engine written in `Rust`.
+A simple, lightweight SQL-like in-memory database engine written in `Rust`.
 
 ## Building and Running
 
