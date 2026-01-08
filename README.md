@@ -10,5 +10,6 @@ A collection of assignments completed as part of the _Programming in Rust_ cours
   - Lab05: [`simple_language`](https://github.com/adamgracikowski/MiNIRust/tree/main/Labs/Lab05/simple_language)
   - Lab07: [`iterloop`](https://github.com/adamgracikowski/MiNIRust/tree/main/Labs/Lab07/iterloop)
   - Lab08: [`smart_pointers`](https://github.com/adamgracikowski/MiNIRust/tree/main/Labs/Lab08/smart_pointers)
+  - Lab10: [`parallel`](https://github.com/adamgracikowski/MiNIRust/tree/main/Labs/Lab10/parallel)
 - Projects:
   - Project01: [`database`](https://github.com/adamgracikowski/MiNIRust/tree/main/Projects/Project01/database)
