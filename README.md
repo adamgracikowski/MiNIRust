@@ -14,3 +14,5 @@ A collection of assignments completed as part of the _Programming in Rust_ cours
   - Lab12: [`state_machine`](https://github.com/adamgracikowski/MiNIRust/tree/main/Labs/Lab12/state_machine)
 - Projects:
   - Project01: [`database`](https://github.com/adamgracikowski/MiNIRust/tree/main/Projects/Project01/database)
+  - Project02: [`grand_strategy`](https://github.com/adamgracikowski/MiNIRust/tree/main/Projects/Project02/project02.pdf)
+  - Project03: [`red_black_tree`](https://github.com/adamgracikowski/MiNIRust/tree/main/Projects/Project03/red_black_tree)
