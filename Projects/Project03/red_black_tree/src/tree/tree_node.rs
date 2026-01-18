@@ -8,7 +8,6 @@ pub struct TreeNode {
     pub key: u64,
     pub value: CharContainer,
     pub color: TreeColor,
-
     pub left: *mut TreeNode,
     pub right: *mut TreeNode,
     pub parent: *mut TreeNode,

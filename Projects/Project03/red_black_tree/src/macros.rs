@@ -19,11 +19,13 @@ mod tests {
     fn test_macro_usage() {
         let tree = red_black_tree! {
             1 => "a",
-            2 => "b"
+            2 => "b",
+            3 => "c"
         };
 
         assert_eq!(tree.get(1), Some("a"));
         assert_eq!(tree.get(2), Some("b"));
-        assert!(!tree.contains(3));
+        assert_eq!(tree.get(3), Some("c"));
+        assert!(!tree.contains(4));
     }
 }

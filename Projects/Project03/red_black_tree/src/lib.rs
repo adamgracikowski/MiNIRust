@@ -12,8 +12,15 @@ const RESET: &str = "\x1b[0m";
 const RED: &str = "\x1b[31m";
 const BOLD: &str = "\x1b[1m";
 
+/// Creates a new, empty Red-Black Tree.
+///
+/// # Safety
+///
+/// This function allocates memory using [`libc::malloc`].
+/// The caller owns the returned pointer and is responsible for eventually
+/// freeing it by calling [`tree_free`].
 #[unsafe(no_mangle)]
-pub extern "C" fn tree_create() -> *mut RedBlackTree {
+pub unsafe extern "C" fn tree_create() -> *mut RedBlackTree {
     unsafe {
         let ptr = libc::malloc(mem::size_of::<RedBlackTree>()) as *mut RedBlackTree;
         if !ptr.is_null() {
@@ -23,8 +30,19 @@ pub extern "C" fn tree_create() -> *mut RedBlackTree {
     }
 }
 
+/// Inserts a key-value pair into the tree.
+///
+/// # Safety
+///
+/// * `tree` must be a valid, non-null pointer to an initialized `RedBlackTree`.
+/// * `value` must be a valid, non-null pointer to a **null-terminated** C string.
+/// * The memory pointed to by `tree` and `value` must be accessible.
 #[unsafe(no_mangle)]
-pub extern "C" fn tree_insert(tree: *mut RedBlackTree, key: u64, value: *const c_char) -> i32 {
+pub unsafe extern "C" fn tree_insert(
+    tree: *mut RedBlackTree,
+    key: u64,
+    value: *const c_char,
+) -> i32 {
     if tree.is_null() || value.is_null() {
         return -1;
     }
@@ -40,8 +58,14 @@ pub extern "C" fn tree_insert(tree: *mut RedBlackTree, key: u64, value: *const c
     }
 }
 
+/// Checks if the tree contains a specific key.
+///
+/// # Safety
+///
+/// * `tree` must be a valid, non-null pointer to an initialized `RedBlackTree`.
+/// * Dereferencing `tree` must be safe.
 #[unsafe(no_mangle)]
-pub extern "C" fn tree_contains(tree: *mut RedBlackTree, key: u64) -> i32 {
+pub unsafe extern "C" fn tree_contains(tree: *mut RedBlackTree, key: u64) -> i32 {
     if tree.is_null() {
         return 0;
     }
@@ -54,8 +78,16 @@ pub extern "C" fn tree_contains(tree: *mut RedBlackTree, key: u64) -> i32 {
     }
 }
 
+/// Retrieves a value associated with a key into a provided buffer.
+///
+/// # Safety
+///
+/// * `tree` must be a valid, non-null pointer to an initialized `RedBlackTree`.
+/// * `buffer` must be a valid pointer to a writable memory region of at least `buffer_size` bytes.
+/// * This function performs a raw memory copy to `buffer`.
+/// * Ensure `buffer_size` is large enough to hold the string plus a null terminator.
 #[unsafe(no_mangle)]
-pub extern "C" fn tree_get(
+pub unsafe extern "C" fn tree_get(
     tree: *mut RedBlackTree,
     key: u64,
     buffer: *mut c_char,
@@ -81,8 +113,14 @@ pub extern "C" fn tree_get(
     }
 }
 
+/// Removes a key from the tree.
+///
+/// # Safety
+///
+/// * `tree` must be a valid, non-null pointer to an initialized `RedBlackTree`.
+/// * The memory pointed to by `tree` must be accessible and mutable.
 #[unsafe(no_mangle)]
-pub extern "C" fn tree_remove(tree: *mut RedBlackTree, key: u64) -> i32 {
+pub unsafe extern "C" fn tree_remove(tree: *mut RedBlackTree, key: u64) -> i32 {
     if tree.is_null() {
         return -1;
     }
@@ -94,8 +132,15 @@ pub extern "C" fn tree_remove(tree: *mut RedBlackTree, key: u64) -> i32 {
     }
 }
 
+/// Frees the memory associated with the tree.
+///
+/// # Safety
+///
+/// * `tree` must be a valid pointer previously returned by `tree_create` (or null).
+/// * After calling this function, the `tree` pointer becomes invalid (dangling)
+///   and must not be used again.
 #[unsafe(no_mangle)]
-pub extern "C" fn tree_free(tree: *mut RedBlackTree) {
+pub unsafe extern "C" fn tree_free(tree: *mut RedBlackTree) {
     if tree.is_null() {
         return;
     }
@@ -105,8 +150,14 @@ pub extern "C" fn tree_free(tree: *mut RedBlackTree) {
     }
 }
 
+/// Prints the structure of the tree to stdout for debugging purposes.
+///
+/// # Safety
+///
+/// * `tree` must be a valid, non-null pointer to an initialized `RedBlackTree`.
+/// * Dereferencing `tree` must be safe.
 #[unsafe(no_mangle)]
-pub extern "C" fn tree_print_structure(tree: *const RedBlackTree) {
+pub unsafe extern "C" fn tree_print_structure(tree: *const RedBlackTree) {
     if tree.is_null() {
         println!("(Tree is null)");
         return;

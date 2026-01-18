@@ -34,6 +34,15 @@ impl CharContainer {
         }
     }
 
+    /// Creates a [`CharContainer`] from a C-style string pointer.
+    ///
+    /// # Safety
+    ///
+    /// This function is unsafe because it dereferences a raw pointer.
+    /// The caller must ensure that:
+    /// 1. The `value` pointer is valid and points to readable memory.
+    /// 2. The string pointed to by `value` is **null-terminated**. If the string
+    ///    does not have a null terminator, this function will read out of bounds.
     pub unsafe fn from_c_str(value: *const c_char) -> Option<Self> {
         if value.is_null() {
             return None;
