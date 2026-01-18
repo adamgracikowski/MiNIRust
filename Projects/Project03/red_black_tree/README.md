@@ -28,6 +28,8 @@ Before running the examples, ensure you have the following installed:
 
 ## Building and Running
 
+### Windows
+
 To build and run the Rust demonstration in `release` mode:
 
 ```
@@ -66,6 +68,16 @@ Execute the resulting binary:
 
 ```
 .\c_red_black_tree.exe
+```
+
+### Linux (via Makefile)
+
+On Linux, you can use the provided `Makefile` to automate the build and run process. It handles building the Rust library, linking it with GCC, and setting the `LD_LIBRARY_PATH`.
+
+**Ste 1:** Use Makefile
+
+```bash
+make
 ```
 
 ## License
